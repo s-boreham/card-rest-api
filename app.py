@@ -1,3 +1,6 @@
+import os
+import re
+
 from flask import Flask, jsonify
 from flask_restful import Resource, Api, reqparse
 from flask_jwt_extended import JWTManager
@@ -10,7 +13,12 @@ from resources.card import Card, CardList
 from blocklist import BLOCKLIST
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+
+uri = os.getenv("DATABASE_URL", 'sqlite:///data.db')  # or other relevant config var
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.secret_key = 'shamrobe' # app.config['JWT_SECRET_KEY'] 
